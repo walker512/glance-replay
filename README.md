@@ -20,7 +20,7 @@ Use a new output directory. Inspect `frames.txt` and `report.json`. The example 
 
 Optional installation: `python -m pip install .`, then use `glance-replay` instead of `python -m glance_replay`. Setuptools is required to build. No package-registry release is implied.
 
-## Scenario contract
+## Scenario contract (schema 1)
 
 A scenario has exactly `schema`, `profile`, `initial`, `events` and `assertions`. The example file is a complete editable template.
 
@@ -56,7 +56,7 @@ Other events are `disconnect`, `revoke` with a permission, and `wait`. Capture r
 7. Permission declarations persist across connection/wear changes. This is an explicit prototype choice, not an OS or SDK promise. Grant/revoke events change only model state.
 8. Capture requests use the same connection/wear gate plus their specific resource permission. Success is named `simulated_capture_allowed`, returns no sensor data and invokes no camera, microphone, file recorder, Bluetooth stack or network API.
 
-These conservative clearing rules help exercise a prototype but do not prove that a real device clears buffers or enforces permissions. There is no continuous sensor stream, battery/load/latency model, optics, gaze, gesture recognition, image understanding, physical interaction or safety certification.
+These conservative clearing rules help exercise a prototype but do not prove that a real device clears buffers or enforces permissions. There is no continuous sensor stream, physical power-consumption/load/latency model, optics, gaze, gesture recognition, image understanding, physical interaction or safety certification.
 
 ## Character-grid output
 
@@ -105,3 +105,14 @@ Primary repository documentation was inspected; these runtimes were not executed
 No real glasses, vendor SDK, optical rendering, Windows/macOS, hosted CI or human usability trial was tested. The camera/microphone tests assert only synthetic states, not actual captures. FIFO/symlink tests can skip on unsupported systems; skips are not passes.
 
 MIT license. Original code and synthetic scenarios by walker512. No upstream competitor implementation or private notification data is bundled.
+
+## Companion, battery, network and recognized voice intents (schema 2)
+
+The optional [platform-state scenario](docs/PLATFORM_STATES.md) extends the same notification-app policy with declared battery percentage, companion-app foreground/background/stopped state, online/offline network and hypothetical camera/microphone/offline-voice/background capabilities. `voice` events contain **already recognized, fixed command intents**, not audio or a speech-recognition result. There is no live phone UI or vendor/device integration.
+
+```sh
+python -m glance_replay replay examples/platform-day.json --out platform-review --require-pass
+python -m glance_replay verify platform-review --require-pass
+```
+
+Schema 1 remains supported without new fields and retains the locked example's original report/frame bytes. All original 30 tests are unchanged; the current public suite has 48 tests, run locally on Linux/Python 3.12 with zero skips. New cases cover battery clearing/recovery, local versus remote notification arrivals, companion/background capability changes, microphone and target-resource voice gates, offline voice declarations, strict assertions and actual CLI replay/verify. There is no new browser, device, ASR, cross-platform or human usability validation.
