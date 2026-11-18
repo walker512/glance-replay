@@ -1,0 +1,224 @@
+{
+  "assertions": [
+    {
+      "after_event": 0,
+      "expect": {
+        "queue": [
+          "remote"
+        ]
+      }
+    },
+    {
+      "after_event": 1,
+      "expect": {
+        "active": "remote",
+        "network": "offline"
+      }
+    },
+    {
+      "after_event": 2,
+      "expect": {
+        "result": "denied_network"
+      }
+    },
+    {
+      "after_event": 3,
+      "expect": {
+        "queue": [
+          "remote",
+          "local"
+        ]
+      }
+    },
+    {
+      "after_event": 4,
+      "expect": {
+        "active": "remote",
+        "result": "denied_network"
+      }
+    },
+    {
+      "after_event": 5,
+      "expect": {
+        "phone_app": "background",
+        "queue": []
+      }
+    },
+    {
+      "after_event": 6,
+      "expect": {
+        "queue": []
+      }
+    },
+    {
+      "after_event": 8,
+      "expect": {
+        "result": "denied_low_battery"
+      }
+    },
+    {
+      "after_event": 9,
+      "expect": {
+        "powered": false
+      }
+    },
+    {
+      "after_event": 10,
+      "expect": {
+        "result": "denied_powered_off"
+      }
+    },
+    {
+      "after_event": 13,
+      "expect": {
+        "active": "fresh"
+      }
+    },
+    {
+      "after_event": 15,
+      "expect": {
+        "result": "simulated_capture_allowed",
+        "voice_command": "capture_camera"
+      }
+    },
+    {
+      "after_event": 16,
+      "expect": {
+        "phone_app": "stopped",
+        "queue": []
+      }
+    }
+  ],
+  "events": [
+    {
+      "at_ms": 0,
+      "id": "remote",
+      "origin": "remote",
+      "priority": 1,
+      "text": "Synthetic reminder",
+      "ttl_ms": 1000,
+      "type": "notify"
+    },
+    {
+      "at_ms": 10,
+      "state": "offline",
+      "type": "network"
+    },
+    {
+      "at_ms": 20,
+      "id": "offlineArrival",
+      "origin": "remote",
+      "priority": 1,
+      "text": "Synthetic reminder",
+      "ttl_ms": 1000,
+      "type": "notify"
+    },
+    {
+      "at_ms": 30,
+      "id": "local",
+      "origin": "local",
+      "priority": 1,
+      "text": "Synthetic reminder",
+      "ttl_ms": 1000,
+      "type": "notify"
+    },
+    {
+      "at_ms": 40,
+      "command": "next",
+      "type": "voice"
+    },
+    {
+      "at_ms": 50,
+      "state": "background",
+      "type": "phone_app"
+    },
+    {
+      "at_ms": 60,
+      "state": "foreground",
+      "type": "phone_app"
+    },
+    {
+      "at_ms": 70,
+      "percent": 10,
+      "type": "battery"
+    },
+    {
+      "at_ms": 80,
+      "command": "capture_camera",
+      "type": "voice"
+    },
+    {
+      "at_ms": 90,
+      "percent": 0,
+      "type": "battery"
+    },
+    {
+      "at_ms": 100,
+      "id": "poweredOff",
+      "origin": "local",
+      "priority": 1,
+      "text": "Synthetic reminder",
+      "ttl_ms": 1000,
+      "type": "notify"
+    },
+    {
+      "at_ms": 110,
+      "percent": 80,
+      "type": "battery"
+    },
+    {
+      "at_ms": 120,
+      "state": "online",
+      "type": "network"
+    },
+    {
+      "at_ms": 130,
+      "id": "fresh",
+      "origin": "remote",
+      "priority": 1,
+      "text": "Synthetic reminder",
+      "ttl_ms": 1000,
+      "type": "notify"
+    },
+    {
+      "at_ms": 140,
+      "command": "next",
+      "type": "voice"
+    },
+    {
+      "at_ms": 150,
+      "command": "capture_camera",
+      "type": "voice"
+    },
+    {
+      "at_ms": 160,
+      "state": "stopped",
+      "type": "phone_app"
+    }
+  ],
+  "initial": {
+    "battery_percent": 80,
+    "connected": true,
+    "network": "online",
+    "permissions": [
+      "notifications",
+      "camera",
+      "microphone"
+    ],
+    "phone_app": "foreground",
+    "worn": true
+  },
+  "profile": {
+    "capabilities": {
+      "background_companion": false,
+      "camera": true,
+      "microphone": true,
+      "offline_voice": false
+    },
+    "columns": 16,
+    "low_battery_percent": 10,
+    "queue_limit": 3,
+    "rows": 2
+  },
+  "schema": 2
+}
