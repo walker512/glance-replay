@@ -130,3 +130,28 @@ python -m glance_replay verify platform-review --require-pass
 ```
 
 Schema 1 remains supported without new fields and retains the locked example's original report/frame bytes. All original 30 tests are unchanged; the published 0.2 suite has 48 tests, run locally on Linux/Python 3.12 with zero skips. New cases cover battery clearing/recovery, local versus remote notification arrivals, companion/background capability changes, microphone and target-resource voice gates, offline voice declarations, strict assertions and actual CLI replay/verify. That release had no browser, device, ASR, cross-platform or human usability validation. See [workbench validation](docs/WORKBENCH_VALIDATION.md) for the new candidate and its remaining limits.
+
+## CLI evidence creation permissions
+
+New `replay` evidence directories request POSIX mode 0700, and every member
+requests mode 0600 at exclusive creation (a stricter umask can restrict further).
+Existing output directories, files or final-path symlinks are never reused or
+overwritten. Bundle bytes, replay semantics and the `verify` format are unchanged.
+Verification of older bundles does not alter their permissions or contents.
+
+The original notification source is still copied in full: this is not redaction,
+encryption or secure deletion. Previously generated directories may remain
+readable by other accounts; this patch does not find or change them. Use a trusted
+parent directory, not a hostile shared location. Malicious same-account directory
+replacement, inherited ACLs and Windows access control are outside this protection;
+Windows ACL behavior has not been tested. Browser downloads are separately managed
+by the browser and are not covered by this CLI patch. An I/O failure can leave a
+private partial folder; it is not valid evidence and verification rejects it.
+A retry requires a fresh destination. No atomic publication or hard-power-loss
+recovery guarantee is made.
+
+Privacy increment validation: 70 tests passed with zero skips on Linux/Python 3.12
+(62 existing plus 8 new). Added checks cover both schema byte outputs, creation-time
+modes under umask 000/022, file/directory/symlink refusal, member injection, concurrent
+creators, partial failures and CLI verification of older permissive-mode outputs
+without changing them. This is not new browser, hardware or Windows acceptance.

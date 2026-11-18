@@ -203,8 +203,11 @@ def text_frames(report):
 def build(source,out):
     raw=read(source);report=replay(raw);files={'source.json':raw,'report.json':canonical(report),'frames.txt':text_frames(report)}
     if any(len(v)>OUTPUT_LIMIT for v in files.values()):raise Invalid('Output limit exceeded.')
-    root=Path(out);root.mkdir(exist_ok=False)
-    for n,v in files.items():(root/n).write_bytes(v)
+    root=Path(out);root.mkdir(mode=0o700,exist_ok=False)
+    for n,v in files.items():
+        fd=os.open(root/n,os.O_WRONLY|os.O_CREAT|os.O_EXCL|
+                   getattr(os,'O_NOFOLLOW',0)|getattr(os,'O_BINARY',0),0o600)
+        with os.fdopen(fd,'wb') as stream:stream.write(v)
     return report
 
 def verify(folder):
