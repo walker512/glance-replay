@@ -155,3 +155,13 @@ Privacy increment validation: 70 tests passed with zero skips on Linux/Python 3.
 modes under umask 000/022, file/directory/symlink refusal, member injection, concurrent
 creators, partial failures and CLI verification of older permissive-mode outputs
 without changing them. This is not new browser, hardware or Windows acceptance.
+
+## Offline comparison across hypothetical profiles
+
+[Profile comparison](docs/PROFILE_COMPARISON.md) replays one shared initial state
+and event stream against 2–8 named configurations, each with its own explicit
+assertions. Inspect per-event differences, first divergences and existing denial
+codes; preserve inputs and verify the report by recomputation. Empty assertions
+remain `no_assertions`, not pass. This is a deterministic fictional-policy
+comparison, not device benchmarking, a regression ranking, or real hardware
+compatibility. Existing scenario formats and replay/workbench commands are unchanged.

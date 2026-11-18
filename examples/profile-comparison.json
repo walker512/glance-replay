@@ -1,0 +1,163 @@
+{
+  "schema": 1,
+  "replay_schema": 2,
+  "initial": {
+    "connected": true,
+    "worn": true,
+    "permissions": [
+      "notifications",
+      "camera",
+      "microphone"
+    ],
+    "battery_percent": 80,
+    "phone_app": "foreground",
+    "network": "online"
+  },
+  "events": [
+    {
+      "at_ms": 0,
+      "type": "notify",
+      "id": "first",
+      "text": "Synthetic reminder",
+      "priority": 1,
+      "ttl_ms": 1000,
+      "origin": "local"
+    },
+    {
+      "at_ms": 1,
+      "type": "network",
+      "state": "offline"
+    },
+    {
+      "at_ms": 2,
+      "type": "voice",
+      "command": "next"
+    },
+    {
+      "at_ms": 3,
+      "type": "phone_app",
+      "state": "background"
+    },
+    {
+      "at_ms": 4,
+      "type": "notify",
+      "id": "second",
+      "text": "Second synthetic reminder",
+      "priority": 1,
+      "ttl_ms": 1000,
+      "origin": "local"
+    },
+    {
+      "at_ms": 5,
+      "type": "capture",
+      "resource": "camera"
+    }
+  ],
+  "configurations": [
+    {
+      "id": "OnlineVoice",
+      "profile": {
+        "columns": 16,
+        "rows": 2,
+        "queue_limit": 3,
+        "low_battery_percent": 10,
+        "capabilities": {
+          "camera": true,
+          "microphone": true,
+          "offline_voice": false,
+          "background_companion": false
+        }
+      },
+      "assertions": [
+        {
+          "after_event": 2,
+          "expect": {
+            "result": "denied_network"
+          }
+        },
+        {
+          "after_event": 4,
+          "expect": {
+            "result": "denied_companion"
+          }
+        },
+        {
+          "after_event": 5,
+          "expect": {
+            "result": "simulated_capture_allowed"
+          }
+        }
+      ]
+    },
+    {
+      "id": "OfflineCompanion",
+      "profile": {
+        "columns": 16,
+        "rows": 2,
+        "queue_limit": 3,
+        "low_battery_percent": 10,
+        "capabilities": {
+          "camera": true,
+          "microphone": true,
+          "offline_voice": true,
+          "background_companion": true
+        }
+      },
+      "assertions": [
+        {
+          "after_event": 2,
+          "expect": {
+            "result": "cycled"
+          }
+        },
+        {
+          "after_event": 4,
+          "expect": {
+            "result": "notified"
+          }
+        },
+        {
+          "after_event": 5,
+          "expect": {
+            "result": "simulated_capture_allowed"
+          }
+        }
+      ]
+    },
+    {
+      "id": "NoCamera",
+      "profile": {
+        "columns": 16,
+        "rows": 2,
+        "queue_limit": 3,
+        "low_battery_percent": 10,
+        "capabilities": {
+          "camera": false,
+          "microphone": true,
+          "offline_voice": true,
+          "background_companion": true
+        }
+      },
+      "assertions": [
+        {
+          "after_event": 2,
+          "expect": {
+            "result": "cycled"
+          }
+        },
+        {
+          "after_event": 4,
+          "expect": {
+            "result": "notified"
+          }
+        },
+        {
+          "after_event": 5,
+          "expect": {
+            "result": "denied_unsupported_resource"
+          }
+        }
+      ]
+    }
+  ]
+}
