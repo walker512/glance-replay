@@ -10,5 +10,9 @@ license = {text = "MIT"}
 authors = [{name = "walker512"}]
 [project.scripts]
 glance-replay = "glance_replay.__main__:main"
+glance-workbench = "glance_replay.workbench:main"
 [tool.setuptools.packages.find]
 include = ["glance_replay*"]
+
+[tool.setuptools.package-data]
+glance_replay = ["assets/*.html", "assets/*.css", "assets/*.js", "assets/*.json"]

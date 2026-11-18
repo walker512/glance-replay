@@ -4,7 +4,21 @@
 
 Define connection/wear/permission events, notifications, TTLs and gestures. Inspect the app's character-grid screens and queue transitions, then gate a regression on explicit expected states. A request to use a camera/microphone is only a permission-state exercise: no image or audio is captured.
 
-This is a deterministic application-policy prototype, **not a hardware emulator, vendor SDK adapter or simulator for arbitrary existing glasses apps**. Its rules are specified below, not inferred from any manufacturer's behavior. There is no browser UI, real-time display or device connection.
+This is a deterministic application-policy prototype, **not a hardware emulator, vendor SDK adapter or simulator for arbitrary existing glasses apps**. Its rules are specified below, not inferred from any manufacturer's behavior. The optional local browser workbench inspects discrete replay states; it is not a real-time device display or connection.
+
+## Local visual workbench
+
+Python 3.11+, no runtime dependencies. From this checkout:
+
+```sh
+python -m glance_replay.workbench --port 8765
+```
+
+Open the printed `http://127.0.0.1:8765/` address. Load either synthetic example or import a JSON scenario, edit it, and choose **Replay scenario**. Scrub through events to inspect the screen, queue, battery/companion/network state and actual-versus-expected assertions. Editing the source invalidates old results. Invalid input retains the source and clears the result. Cancel stops waiting and discards the response; it does not promise interruption of an already executing bounded server computation.
+
+Download source/report for inspection. A downloaded report alone is **not** a CLI-verifiable bundle: use the CLI below with the downloaded source to build and verify the complete evidence directory. PASS means only that all supplied assertions passed, not device compatibility; no assertions is explicitly not a pass.
+
+After `python -m pip install .`, `glance-workbench` provides the same interface, including bundled assets. Stop with Ctrl-C. The server binds only IPv4 loopback, requires the exact printed Host and same-origin requests, and protects POST with a per-process token. No remote hosting or reverse proxy is supported. It is a single-user local tool, not authentication against malicious local processes/browser extensions, a multi-tenant service or a resource-exhaustion sandbox. Do not expose its port. The server keeps imports in memory and does not write them to disk; browser downloads may contain all supplied text and follow your browser's storage settings. No cloud API or API key is needed.
 
 ## Run the synthetic scenario
 
@@ -86,7 +100,7 @@ A result directory contains exactly:
 
 `verify` reconstructs both outputs from the bundled source. It checks internal consistency, not authenticity, policy adequacy or hardware observations. Coordinated replacement of inputs and outputs can pass. Keep an external trusted signature/hash if provenance matters.
 
-No telemetry, network, Bluetooth, live notification feed, environment reading or actual sensor access is used. The bundled examples are original synthetic text. **Your supplied notification text appears in output files**; use synthetic or authorized data, and inspect it before sharing. Errors do not echo supplied contents. No private reporting destination is designated; keep secrets out of public issues.
+The replay engine uses no telemetry, network, Bluetooth, live notification feed, environment reading or actual sensor access. The optional workbench uses local HTTP only; it makes no external service requests. The bundled examples are original synthetic text. **Your supplied notification text appears in output files**; use synthetic or authorized data, and inspect it before sharing. Errors do not echo supplied contents. No private reporting destination is designated; keep secrets out of public issues.
 
 Inputs are bounded to 1 MiB, JSON depth is bounded, duplicate keys/floats/non-finite numbers/malformed Unicode are rejected, and regular non-symlink files are required. The file guard is not a sandbox against hostile parent-directory changes. Outputs are serialized and checked against an independent 8 MiB per-file bound before creating a new directory. Existing directories are never overwritten; an I/O failure can leave a partial directory that must not be treated as complete.
 
@@ -100,7 +114,7 @@ Primary repository documentation was inspected; these runtimes were not executed
 
 ## Validation
 
-30 public tests executed on Linux/Python 3.12. Coverage includes priority/FIFO/eviction, exact TTL boundaries, hand-picked gesture and lifecycle traces, mocked permission denial/allowance, display truncation, 100 seeded incremental notification-retention scenarios against a separate ranking oracle, strict inputs, maximum 500-event self-verifying output, byte preservation, tampering, bounded file handling and CLI exit codes.
+Historical schema-1 validation: 30 public tests executed on Linux/Python 3.12. Coverage includes priority/FIFO/eviction, exact TTL boundaries, hand-picked gesture and lifecycle traces, mocked permission denial/allowance, display truncation, 100 seeded incremental notification-retention scenarios against a separate ranking oracle, strict inputs, maximum 500-event self-verifying output, byte preservation, tampering, bounded file handling and CLI exit codes.
 
 No real glasses, vendor SDK, optical rendering, Windows/macOS, hosted CI or human usability trial was tested. The camera/microphone tests assert only synthetic states, not actual captures. FIFO/symlink tests can skip on unsupported systems; skips are not passes.
 
@@ -115,4 +129,4 @@ python -m glance_replay replay examples/platform-day.json --out platform-review 
 python -m glance_replay verify platform-review --require-pass
 ```
 
-Schema 1 remains supported without new fields and retains the locked example's original report/frame bytes. All original 30 tests are unchanged; the current public suite has 48 tests, run locally on Linux/Python 3.12 with zero skips. New cases cover battery clearing/recovery, local versus remote notification arrivals, companion/background capability changes, microphone and target-resource voice gates, offline voice declarations, strict assertions and actual CLI replay/verify. There is no new browser, device, ASR, cross-platform or human usability validation.
+Schema 1 remains supported without new fields and retains the locked example's original report/frame bytes. All original 30 tests are unchanged; the published 0.2 suite has 48 tests, run locally on Linux/Python 3.12 with zero skips. New cases cover battery clearing/recovery, local versus remote notification arrivals, companion/background capability changes, microphone and target-resource voice gates, offline voice declarations, strict assertions and actual CLI replay/verify. That release had no browser, device, ASR, cross-platform or human usability validation. See [workbench validation](docs/WORKBENCH_VALIDATION.md) for the new candidate and its remaining limits.
