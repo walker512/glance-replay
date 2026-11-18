@@ -1,0 +1,120 @@
+{
+  "schema": 1,
+  "profile": {
+    "columns": 12,
+    "rows": 2,
+    "queue_limit": 2
+  },
+  "initial": {
+    "connected": false,
+    "worn": false,
+    "permissions": []
+  },
+  "events": [
+    {
+      "at_ms": 0,
+      "type": "connect"
+    },
+    {
+      "at_ms": 0,
+      "type": "wear"
+    },
+    {
+      "at_ms": 0,
+      "type": "grant",
+      "permission": "notifications"
+    },
+    {
+      "at_ms": 100,
+      "type": "notify",
+      "id": "lesson",
+      "text": "Lesson starts at 10",
+      "priority": 1,
+      "ttl_ms": 1000
+    },
+    {
+      "at_ms": 200,
+      "type": "notify",
+      "id": "timer",
+      "text": "Break time",
+      "priority": 5,
+      "ttl_ms": 300
+    },
+    {
+      "at_ms": 300,
+      "type": "tap"
+    },
+    {
+      "at_ms": 500,
+      "type": "wait"
+    },
+    {
+      "at_ms": 600,
+      "type": "capture",
+      "resource": "camera"
+    },
+    {
+      "at_ms": 700,
+      "type": "remove"
+    },
+    {
+      "at_ms": 800,
+      "type": "wear"
+    },
+    {
+      "at_ms": 900,
+      "type": "grant",
+      "permission": "camera"
+    },
+    {
+      "at_ms": 1000,
+      "type": "capture",
+      "resource": "camera"
+    }
+  ],
+  "assertions": [
+    {
+      "after_event": 4,
+      "expect": {
+        "active": "timer",
+        "queue": [
+          "timer",
+          "lesson"
+        ]
+      }
+    },
+    {
+      "after_event": 5,
+      "expect": {
+        "active": "lesson"
+      }
+    },
+    {
+      "after_event": 6,
+      "expect": {
+        "queue": [
+          "lesson"
+        ]
+      }
+    },
+    {
+      "after_event": 7,
+      "expect": {
+        "result": "denied_permission"
+      }
+    },
+    {
+      "after_event": 8,
+      "expect": {
+        "screen": [],
+        "queue": []
+      }
+    },
+    {
+      "after_event": 11,
+      "expect": {
+        "result": "simulated_capture_allowed"
+      }
+    }
+  ]
+}
