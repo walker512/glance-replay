@@ -165,3 +165,8 @@ codes; preserve inputs and verify the report by recomputation. Empty assertions
 remain `no_assertions`, not pass. This is a deterministic fictional-policy
 comparison, not device benchmarking, a regression ranking, or real hardware
 compatibility. Existing scenario formats and replay/workbench commands are unchanged.
+
+To share fewer details, optionally export aggregate counts from a verified
+bundle with `python -m glance_replay.compare export-summary comparison-bundle --out comparison-counts.json`.
+The [export limits](docs/PROFILE_COMPARISON.md#aggregate-export-for-manual-review)
+explain what is omitted and why counts still need review before sharing.

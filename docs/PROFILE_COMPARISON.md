@@ -134,3 +134,33 @@ replay schemas, exact types, tampered bundles, output preflight, private creatio
 links, concurrent creation and partial writes. These are synthetic local model
 and real CLI tests. No browser access or new Windows/macOS/native-device test is
 claimed. This increment does not complete the full smart-glasses product theme.
+
+## Aggregate export for manual review
+
+After building a comparison bundle, use a new output file outside that bundle:
+
+```sh
+python -m glance_replay.compare export-summary NEW_COMPARISON --out comparison-counts.json
+```
+
+Use the same bundle path you passed to `build --out`. This opt-in command verifies
+the complete source bundle by local recomputation before writing. It is silent
+on success and does not modify the bundle. It refuses existing files and
+symlinks. Use a trusted output parent directory; on POSIX the permissions
+requested at creation are 0600 (the umask may make them more restrictive).
+A write failure can leave a partial output; trust only a successful command and
+inspect the file before sharing. Windows ACL privacy and hostile parent-directory
+replacement are not covered.
+
+The deterministic schema 1 JSON exposes only total events, the number of events
+with a trace difference across any profiles, and each profile's passed and
+failed assertion counts and count of outcomes starting with `denied_`.
+Dropped items are not counted as denials. Zero assertions is not a pass.
+Profiles are named `profile-1`, `profile-2`, and so on in source order. Original
+profile and event IDs, payloads, timestamps, frame content, reasons, URLs and
+hashes are not included.
+
+This is **not anonymization**: counts and order are still potentially revealing,
+especially when people know the scenario or compare multiple summaries. Review
+before sharing. It is not replay evidence, proof of origin, or a test of real
+devices. Keep the private full bundle for recomputation and troubleshooting.

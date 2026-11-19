@@ -12,6 +12,8 @@ SCOPE = ('Declared hypothetical profiles in the same deterministic app model. '
          'No device, SDK, speech recognition, model, network, energy measurement '
          'or real permission guarantee. Different outcomes do not rank devices.')
 FILES = {'source.json', 'comparison.json', 'comparison.txt'}
+SUMMARY_SCOPE = ('Counts from a locally recomputed hypothetical replay. Not anonymous, '
+                 'not replayable, and not proof of authenticity or device behavior.')
 
 
 def load(raw):
@@ -137,15 +139,59 @@ def verify(folder):
     return report
 
 
+def export_summary(folder, out):
+    """Write a new aggregate-only export after verifying the complete bundle."""
+    report = verify(folder)
+    destination = Path(out)
+    try:
+        inside_bundle = destination.parent.resolve().is_relative_to(Path(folder).resolve())
+    except RuntimeError:
+        raise core.Invalid('Invalid summary destination.') from None
+    if inside_bundle:
+        raise core.Invalid('Keep summary outside its source bundle.')
+
+    profiles = []
+    for ordinal, run in enumerate(report['runs'], 1):
+        replay = run['replay']
+        assertions = replay['assertions']
+        passed = sum(check['passed'] for check in assertions)
+        profiles.append({
+            'profile': f'profile-{ordinal}',
+            'assertions_passed': passed,
+            'assertions_failed': len(assertions) - passed,
+            'denied_events': sum(step['result'].startswith('denied_') for step in replay['trace']),
+        })
+    # Construct only fixed fields. Never copy free-form fields from the source.
+    summary = {
+        'schema': 1,
+        'kind': 'glance-comparison-counts',
+        'events': len(report['events']),
+        'differing_events': sum(bool(event['different_fields']) for event in report['events']),
+        'profiles': profiles,
+        'scope': SUMMARY_SCOPE,
+    }
+    content = core.canonical(summary)
+    fd = os.open(destination, os.O_WRONLY | os.O_CREAT | os.O_EXCL
+                 | getattr(os, 'O_NOFOLLOW', 0) | getattr(os, 'O_BINARY', 0), 0o600)
+    with os.fdopen(fd, 'wb') as stream:
+        stream.write(content)
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest='command', required=True)
     make = commands.add_parser('build'); make.add_argument('source'); make.add_argument('--out', required=True)
     check = commands.add_parser('verify'); check.add_argument('folder')
+    share = commands.add_parser('export-summary', help='Write aggregate counts to a new JSON file')
+    share.add_argument('folder')
+    share.add_argument('--out', required=True)
     for command in (make, check):
         command.add_argument('--require-all-pass', action='store_true')
     args = parser.parse_args(argv)
     try:
+        if args.command == 'export-summary':
+            export_summary(args.folder, args.out)
+            return 0
         report = build(args.source, args.out) if args.command == 'build' else verify(args.folder)
         print(json.dumps({'consistent': True, 'first_divergence': report['first_divergence'],
             'assertion_statuses': report['assertion_statuses'], 'all_assertions_pass': report['all_assertions_pass'], 'scope': SCOPE}, sort_keys=True))
